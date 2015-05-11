@@ -1,0 +1,19 @@
+{
+    "name": "odeskconf/notifier",
+    "description": "Pushes stuff",
+    "authors": [
+        {
+            "name": "Gregory Buzdyk",
+            "email": "buzdyk.gregory@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "~5.0",
+        "vlucas/phpdotenv": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+          "Slacky\\": "Slacky/"
+        }
+    }
+}
