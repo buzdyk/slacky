@@ -21,11 +21,11 @@ class Slacker {
         $this->channel = $channel_id;
     }
 
-    public function postMessage($message)
+    public function postMessage($message, $username = '2ch Bot')
     {
         $params = $this->params([
             'text'      => $message,
-            'username'  => '2ch Bot',
+            'username'  => $username,
             'as_user'   => 'false',
             'unfurl_links' => 'true',
             'unfurl_media' => 'true',

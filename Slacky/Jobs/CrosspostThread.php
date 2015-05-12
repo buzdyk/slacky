@@ -38,7 +38,7 @@ class CrosspostThread implements Runnable {
             }
 
             $message = $this->getMessage($post);
-            $this->thread_ch->postMessage($message);
+            $this->thread_ch->postMessage($message, $post->num);
             $last_crossposted = $this->last_crossposted($post->num);
 
             $cnt++;
@@ -61,11 +61,11 @@ class CrosspostThread implements Runnable {
 
     protected function getMessage($post)
     {
-        $message = "*{$post->num}*\n";
+        $message = "";
         if (isset($post->files)) {
-            array_map(function($file) use (&$message) {
+            foreach ($post->files as $file) {
                 $message .= "https://2ch.hk/wrk/{$file->path} \n";
-            }, $post->files);
+            }
         }
 
         $message .= html_entity_decode(
