@@ -40,7 +40,11 @@ class CrosspostThread implements Runnable {
             }
 
             $message = $this->getMessage($post);
-            $this->threadCh->postMessage($message, $post->num);
+            try {
+                $this->threadCh->postMessage($message, $post->num);
+            } catch (\Exception $e) {
+                /** @todo find a way to send large messages */
+            }
 
             $cnt++;
         }
