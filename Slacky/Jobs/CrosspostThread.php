@@ -13,12 +13,17 @@ class CrosspostThread implements Runnable {
     /**
      * @var Slacker
      */
-    protected $slacker;
+    protected $generalCh;
+
+    /**
+     * @var Slacker
+     */
+    protected $threadCh;
 
     public function __construct()
     {
-        $this->general_ch = new Slacker(getenv('SLACK_GENERAL'));
-        $this->thread_ch  = new Slacker(getenv('SLACK_THREAD'));
+        $this->generalCh = new Slacker(getenv('SLACK_GENERAL'));
+        $this->threadCh  = new Slacker(getenv('SLACK_THREAD'));
         $this->dvacher    = new Dvacher();
     }
 
@@ -35,7 +40,7 @@ class CrosspostThread implements Runnable {
             }
 
             $message = $this->getMessage($post);
-            $this->thread_ch->postMessage($message, $post->num);
+            $this->threadCh->postMessage($message, $post->num);
 
             $cnt++;
         }
@@ -46,7 +51,7 @@ class CrosspostThread implements Runnable {
     protected function lastCrossposted()
     {
         $id = null;
-        $messages = $this->thread_ch->messages()->messages;
+        $messages = $this->threadCh->messages()->messages;
 
         foreach ($messages as $message) {
             preg_match('/^([0-9]{5,7})$/', $message->username, $matches);
@@ -83,7 +88,7 @@ class CrosspostThread implements Runnable {
 
     protected function threadId()
     {
-        $topic = $this->general_ch->info()->channel->topic->value;
+        $topic = $this->generalCh->info()->channel->topic->value;
         preg_match('/([0-9]{4,})/', $topic, $matches);
 
         if (!$matches) {
