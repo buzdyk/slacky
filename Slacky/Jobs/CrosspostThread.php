@@ -24,22 +24,18 @@ class CrosspostThread implements Runnable {
 
     public function run()
     {
-        $topic = $this->general_ch->info()->channel->topic->value;
-        preg_match('/([0-9]{4,})/', $topic, $matches);
-        $thread_id = $matches[0];
-
-        $last_crossposted = $this->last_crossposted();
-        $posts = $this->dvacher->getPosts($thread_id);
+        $threadId = $this->threadId();
+        $lastCrossposted = $this->lastCrossposted();
+        $posts = $this->dvacher->getPosts($threadId);
 
         $cnt = 0;
         foreach ($posts as $post) {
-            if ($post->num <= $last_crossposted) {
+            if ($post->num <= $lastCrossposted) {
                 continue;
             }
 
             $message = $this->getMessage($post);
             $this->thread_ch->postMessage($message, $post->num);
-            $last_crossposted = $this->last_crossposted($post->num);
 
             $cnt++;
         }
@@ -47,13 +43,21 @@ class CrosspostThread implements Runnable {
         return "Crossposted $cnt new post(s)\n";
     }
 
-    protected function last_crossposted($id = null)
+    protected function lastCrossposted()
     {
-        $filename = __DIR__ . '/../../storage';
-        if ($id) {
-            file_put_contents($filename, (int) $id);
-        } else {
-            $id = (int) file_get_contents($filename);
+        $id = null;
+        $messages = $this->thread_ch->messages()->messages;
+
+        foreach ($messages as $message) {
+            preg_match('/^([0-9]{5,7})$/', $message->username, $matches);
+            if ($matches) {
+                $id = $matches[0];
+                break;
+            }
+        }
+
+        if (!$id) {
+            throw new \Exception('Can\'t find latest post ID');
         }
 
         return $id;
@@ -75,5 +79,17 @@ class CrosspostThread implements Runnable {
         );
 
         return $message;
+    }
+
+    protected function threadId()
+    {
+        $topic = $this->general_ch->info()->channel->topic->value;
+        preg_match('/([0-9]{4,})/', $topic, $matches);
+
+        if (!$matches) {
+            throw new \Exception('Can\'t find thread ID. Please add thread url to the general channel topic.');
+        }
+
+        return $matches[0];
     }
 }

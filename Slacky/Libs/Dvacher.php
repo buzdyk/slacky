@@ -14,9 +14,9 @@ class Dvacher {
         $this->client = new Client(['base_url' => 'https://2ch.hk']);
     }
 
-    public function getPosts($thread_id)
+    public function getPosts($threadId)
     {
-        $result = json_decode($this->client->get("/wrk/res/{$thread_id}.json")->getBody());
+        $result = json_decode($this->client->get("/wrk/res/{$threadId}.json")->getBody());
 
         if ($result) {
             return $result->threads[0]->posts;

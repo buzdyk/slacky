@@ -35,6 +35,14 @@ class Slacker {
         return $this->client->get('/api/chat.postMessage?' . $params);
     }
 
+    public function messages()
+    {
+        $params = $this->params();
+        $response = $this->client->get('/api/channels.history?' . $params);
+
+        return json_decode($response->getBody());
+    }
+
     public function info()
     {
         $params = $this->params();
